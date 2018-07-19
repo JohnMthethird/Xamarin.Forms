@@ -20,6 +20,7 @@ namespace Xamarin.Forms.Platform.Android
 		MasterDetailContainer _masterLayout;
 		MasterDetailPage _page;
 		bool _presented;
+		Platform _platform;
 
 		public MasterDetailRenderer(Context context) : base(context)
 		{
@@ -30,7 +31,23 @@ namespace Xamarin.Forms.Platform.Android
 		{
 		}
 
-		IMasterDetailPageController MasterDetailPageController => _page as IMasterDetailPageController;
+		Platform Platform
+		{
+			get
+			{
+				if (_platform == null)
+				{
+					if (Context is FormsApplicationActivity activity)
+					{
+						_platform = activity.Platform;
+					}
+				}
+
+				return _platform;
+			}
+		}
+
+		IMasterDetailPageController MasterDetailPageController => _page;
 
 		public bool Presented
 		{
@@ -243,7 +260,7 @@ namespace Xamarin.Forms.Platform.Android
 		void HandleMasterPropertyChanged(object sender, PropertyChangedEventArgs e)
 		{
 			if (e.PropertyName == Page.TitleProperty.PropertyName || e.PropertyName == Page.IconProperty.PropertyName)
-				((Platform)_page.Platform).UpdateMasterDetailToggle(true);
+				Platform?.UpdateMasterDetailToggle(true);
 		}
 
 		void HandlePropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -254,7 +271,7 @@ namespace Xamarin.Forms.Platform.Android
 			else if (e.PropertyName == "Detail")
 			{
 				UpdateDetail();
-				((Platform)_page.Platform).UpdateActionBar();
+				Platform?.UpdateActionBar();
 			}
 			else if (e.PropertyName == MasterDetailPage.IsPresentedProperty.PropertyName)
 			{
@@ -358,7 +375,7 @@ namespace Xamarin.Forms.Platform.Android
 				{
 					SetScrimColor(isShowingSplit ? Color.Transparent.ToAndroid() : (int)DefaultScrimColor);
 				}
-				((Platform)_page.Platform).UpdateMasterDetailToggle();
+				Platform?.UpdateMasterDetailToggle();
 			}
 		}
 	}
